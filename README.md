@@ -1,6 +1,7 @@
 # Multi Cherry-Pick Extension Tool
 
 [![Build Status](https://dev.azure.com/1es-cat/azure-repos-pr-multi-cherry-pick/_apis/build/status/microsoft.azure-repos-pr-multi-cherry-pick?branchName=master)](https://dev.azure.com/1es-cat/azure-repos-pr-multi-cherry-pick/_build/latest?definitionId=24&branchName=master)
+[![Release Status](https://vsrm.dev.azure.com/1es-cat/_apis/public/Release/badge/a185aa03-7d78-4c7d-b5fb-f7d997b096f9/1/1)](https://dev.azure.com/1es-cat/azure-repos-pr-multi-cherry-pick/_release?definitionId=1)
 
 An easy way to cherry-pick a PR's commits to multiple branches.
 Use the git cherry-pick operation to apply changes to another
