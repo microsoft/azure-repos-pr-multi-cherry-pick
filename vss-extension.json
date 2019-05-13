@@ -1,0 +1,68 @@
+{
+  "manifestVersion": 1,
+  "version": "0.0.61",
+  "id": "pr-multi-cherry-pick",
+  "name": "PR Multi-Cherry-Pick",
+  "description": "Cherry-pick a PR's commits into multiple branches at once",
+  "demands": ["api-version/3.0"],
+  "scopes": ["vso.code_full"],
+  "categories": ["Azure Repos"],
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "content": {
+    "details": {
+      "path": "README.md"
+    }
+  },
+  "icons": {
+    "default": "img/logo.png"
+  },
+  "branding": {
+    "color": "rgb(166, 31, 52)",
+    "theme": "dark"
+  },
+  "tags": ["Repos", "PR", "Cherry-pick"],
+  "repository": {
+    "type": "git",
+    "uri": "https://dev.azure.com/1es-cat/Office/_git/azure-repos-pr-cherry-picks"
+  },
+  "links": {
+    "support": {
+      "uri": "mailto:1es-lighthouse-eng@microsoft.com"
+    }
+  },
+  "files": [
+    {
+      "path": "dist",
+      "addressable": true
+    },
+    {
+      "path": "img",
+      "addressable": true
+    }
+  ],
+  "contributions": [
+    {
+      "id": "contextMenu",
+      "type": "ms.vss-web.action",
+      "targets": ["ms.vss-code-web.pull-request-action-menu"],
+      "properties": {
+        "group": "actions",
+        "uri": "dist/index.html",
+        "text": "Multi-cherry-pick...",
+        "registeredObjectId": "pr-context-menu",
+        "icon": "img/icon.png"
+      }
+    },
+    {
+      "id": "cherryPicksDialog",
+      "type": "ms.vss-web.external-content",
+      "properties": {
+        "uri": "dist/dialog.html"
+      }
+    }
+  ]
+}

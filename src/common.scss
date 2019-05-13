@@ -1,0 +1,123 @@
+@import "node_modules/azure-devops-ui/Core/_platformCommon.scss";
+
+@import "node_modules/azure-devops-ui/Core/core.scss";
+
+#root {
+  height: 100%;
+  width: 100%;
+  display: flex;
+}
+
+body {
+  overflow: auto;
+}
+
+.left-content-spacing {
+  margin-left: 16px;
+}
+
+.saving-indicator-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.saving-indicator {
+  text-align: center;
+  color: $communication-foreground;
+  max-width: 100%;
+}
+
+.sample-panel {
+  font-size: $fontSizeMM;
+}
+
+.sample-panel-button-bar {
+  margin-bottom: 20px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.scroll-content {
+  overflow-y: scroll;
+}
+
+.dialog-button {
+  margin-right: 10px;
+  position: relative;
+  bottom: 0;
+  right: 0;
+}
+
+.list-example-row {
+  padding: 0px 12px;
+}
+
+.container {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.child {
+  margin: auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.flex-column.bolt-textfield-default-width.bolt-textfield-default-width {
+  width: 100%;
+  height: 100%;
+}
+
+.bolt-textfield-input.flex-grow {
+  width: 100%;
+  height: 100%;
+}
+
+.bolt-expandable-button {
+  display: flex;
+}
+
+.bolt-expandable-button > .bolt-button.enabled.bolt-focus-treatment {
+  width: 100%;
+  height: 100%;
+}
+
+.cherry-pick-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.cherry-pick-table {
+  width: 100%;
+  height: 100%;
+}
+
+.cherry-pick-row {
+  padding: 5px;
+  vertical-align: middle;
+  align-items: stretch;
+  text-align: left;
+  height: 100%;
+  width: 100%;
+}
+
+.summary-row {
+  padding: 10px 5px;
+}
+
+.justify-start.flex-grow.text-ellipsis {
+  text-align: left;
+}
+
+.main-description {
+  padding-bottom: 16px !important;
+}
