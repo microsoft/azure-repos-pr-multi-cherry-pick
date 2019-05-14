@@ -181,7 +181,7 @@ export async function ValidateTargetBranchesAsync(
     targetTopicBranchName = `refs/heads/${targetTopicBranchName}`;
   }
 
-  let targetRefrence: GitPullRequestSearchCriteria = {
+  const targetRefrence: GitPullRequestSearchCriteria = {
     targetRefName: "",
     creatorId: "",
     includeLinks: false,
@@ -192,17 +192,20 @@ export async function ValidateTargetBranchesAsync(
     status: PullRequestStatus.Active
   };
 
-  let pullRequests = await client
-    .getPullRequestsByProject(repository.project.id, targetRefrence)
-    .catch(promise =>
-      console.log("There was an error retrieving the Pull requests: ", promise)
+  try {
+    const pullRequests = await client.getPullRequestsByProject(
+      repository.project.id,
+      targetRefrence
     );
 
-  if (pullRequests) {
-    return {
-      error: `Topic branch has a previously open PR, please delete or rename`,
-      result: false
-    };
+    if (pullRequests !== undefined && pullRequests.length > 0) {
+      return {
+        error: `Topic branch has a previously open PR, please delete or rename`,
+        result: false
+      };
+    }
+  } catch (ex) {
+    return { error: ex, result: false };
   }
 
   return {
