@@ -7,7 +7,9 @@ import {
   GitAsyncRefOperationParameters,
   GitPullRequestMergeStrategy,
   GitAsyncOperationStatus,
-  GitRepository
+  GitRepository,
+  GitPullRequestSearchCriteria,
+  PullRequestStatus
 } from "azure-devops-extension-api/Git";
 
 import { Constants, trimStart } from "../utilities";
@@ -170,6 +172,35 @@ export async function ValidateTargetBranchesAsync(
   if (targetTopicRefs.find(x => x.name === `refs/${topicBranch}`)) {
     return {
       error: `Target topic branch already exists`,
+      result: false
+    };
+  }
+
+  //Check that target topic branch doesnt have any open PR's
+  if (!targetTopicBranchName.startsWith("refs/heads/")) {
+    targetTopicBranchName = `refs/heads/${targetTopicBranchName}`;
+  }
+
+  let targetRefrence: GitPullRequestSearchCriteria = {
+    targetRefName: "",
+    creatorId: "",
+    includeLinks: false,
+    repositoryId: repository.id,
+    reviewerId: "",
+    sourceRefName: targetTopicBranchName,
+    sourceRepositoryId: "",
+    status: PullRequestStatus.Active
+  };
+
+  let pullRequests = await client
+    .getPullRequestsByProject(repository.project.id, targetRefrence)
+    .catch(promise =>
+      console.log("There was an error retrieving the Pull requests: ", promise)
+    );
+
+  if (pullRequests) {
+    return {
+      error: `Topic branch has a previously open PR, please delete or rename`,
       result: false
     };
   }
