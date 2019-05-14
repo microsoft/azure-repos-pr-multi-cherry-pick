@@ -11,23 +11,16 @@ If the **Pull request** option is selected, a pull request will be opened to the
 1. Install the extension from the [marketplace](https://marketplace.visualstudio.com/items?itemName=1eslighthouseinternal.pr-multi-cherry-pick-dev&ssr=false#overview) into your Azure DevOps organization.
 2. Navigate to your pull request.
 3. Select the context menu (...)
-4. Select Multi cherry-pick.
+4. Select **Multi cherry-pick**.
 
+<p style="padding-left:25px">
 <img width="409" alt="Screen Shot 2019-05-10 at 4 20 10 PM" src="https://user-images.githubusercontent.com/19557880/57596172-1a1af400-74fe-11e9-8c0d-18291d20590a.png">
+</p>
 
-5. Add as many target branches as you would like using the <img width="45" alt="Screen Shot 2019-05-13 at 1 22 10 PM" src="https://user-images.githubusercontent.com/19557880/57651487-2e083980-7582-11e9-8cbf-13faeeb5b0a0.png"> button.
-6. The **Complete** button will not enable until you have selected a target branch and populated the topic branch field for each row.
-7. An error will appear if you select a name for a target topic branch that already exists.
-8. Once all the fields have been validated and you select the **Complete button**, you will be taken to a summary page that will describe if the corresponding PR/branch creation was successful.
-9. For each successful PR/branch, its location is hyperlinked on the summary page.
+5. Add as many cherry-pick targets as you would like.
+6. After clicking **Complete** a summary page will appear with links to branches and PR's created from the tool.
 
-## Learn more about developing and testing this extension
-
-The [source](https://github.com/microsoft/azure-repos-pr-multi-cherry-pick) to this extension is available. Feel free to take, fork, and extend.
-
-> Microsoft DevLabs is an outlet for experiments from Microsoft, experiments that represent some of the latest ideas around developer tools. Solutions in this category are designed for broad usage, and you are encouraged to use and provide feedback on them; however, these extensions are not supported nor are any commitments made as to their longevity.
-
-## Technoliges used to devlop
+## Technologies used to develop the extension
 
 - Code written in Typescript; styling defined using SASS.
 - Webpack for watching and building files during development, and for building optimized bundles for production.
@@ -41,14 +34,14 @@ You will need:
 
 - [Visual Studio Code](https://code.visualstudio.com/download)
 - [Firefox](https://www.mozilla.org/firefox/) (the VS Code Debugger for Chrome extension [doesn’t support iframes](https://github.com/microsoft/vscode-chrome-debug/issues/786) yet)
-- [Debugger for Firefox](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-firefox-debug) VS Code extension
+- The [Debugger for Firefox](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-firefox-debug) VS Code extension
 
-### **Prerequisite: Organization Permission Level**
+### **Prereq: Organization permission level**
 
-- To develop and test the extension you will neeed an organization where you have permission to install extensions to (i.e. you are the owner).
+- To develop and test the extension you will need an organization where you have permission to install extensions to (i.e. you are the owner).
 - If you don't have a personal organization, you can [create an organization for free](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops).
 
-### **Prerequisite: Node and NPM**
+### **Prereq: Node and NPM**
 
 - **Windows and Mac OSX**: Download and install node from [nodejs.org](http://nodejs.org/).
 
@@ -76,7 +69,7 @@ npm -v
 
 Note: On Windows, if it's still returning npm 2.x, run `where npm`. Notice hits in program files. Rename those two npm files and the 5.6.0 in AppData will win.
 
-### **Prerequisite: Create a publisher**
+### **Prereq: Create a publisher**
 
 All extensions, including extensions from Microsoft, live under a publisher. Anyone can create a publisher and publish extensions under it. You can also give other people access to your publisher if a team is developing the extension.
 
@@ -85,7 +78,7 @@ You will do one of two things:
 - Sign in to the Visual Studio Marketplace management portal
 - If you don't already have a publisher, you'll be prompted to create one. Learn how to create one [here](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=azure-devops)
 
-### **Install Dependencies**
+### **Install dependencies**
 
 Run this command once:
 
@@ -93,16 +86,16 @@ Run this command once:
 npm install
 ```
 
-### **Building**
+### **Build the Extension**
 
 This extension uses webpack for bundling, webpack-dev-server for watching files and serving bundles during development.
 Two bundles are defined for webpack, one for the main dialog, one for the extension context menu registration.
 All actions can be triggered using npm scripts (`npm run <target>`), no additional task runner required.
 
-### **Development- deploy your dev extension to Azure DevOps**
+### **Deploy the Extension**
 
 You will need to deploy your extension to the marketplace at least once so that you can share it with your desired organization
-and install it. In order to do this you will need to generate a Personal Access Token(PAT), learn how to do that [here](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops). When creating your PAT be sure to select All accessible organizations under **Organization** and that the **Marketplace** scope is set to Publish.
+and install it. In order to do this you will need to generate a personal access token (PAT), learn how to do that [here](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops). When creating your PAT, under **Organization**, select **All accessible organizations**, and set the **Marketplace** scope to **Publish**.
 
 Then run once, inserting your PAS into [token]:
 
@@ -120,13 +113,13 @@ To start webpack-dev-server run:
 npm run start:dev
 ```
 
-Now if you go to `localhost:3000` in your browser, you should get an untrusted certificate error page. Click on advanced and then trust the certificate. Go back to Azure DevOps and your extension should now load correctly and any changes to the source code will cause webpack to recompile and reload the extension automatically.
+Now if you go to `localhost:3000` in your browser, you should get an untrusted certificate error page. Select **Advanced** and then trust the certificate. Go back to Azure DevOps and your extension should now load correctly and any changes to the source code will cause webpack to recompile and reload the extension automatically.
 
 Although most code changes will be reflected immediately, you may still need to occasionally update your extension in the marketplace. The dev extension loads all its resources from the webpack-dev-server, but the manifest itself is being loaded from the published code. Therefore, any changes to the manifest file will not be properly reflected in Azure DevOps until the extension has been republished.
 
 ### **Configure your VS Code project to debug against Azure DevOps**
 
-Hit F5 in VS Code to start debugging (making sure the webpack-dev-server is still running). The default launch configuration should be set to Firefox. Chrome configurations are included in the sample as well in case the Chrome debugging extension eventually supports iframes. However, debugging iframes is only supported in the Debugger for Firefox extension for now.
+In VS Code, press **F5** to start debugging (making sure the webpack-dev-server is still running). The default launch configuration should be set to Firefox. Chrome configurations are included in the sample as well in case the Chrome debugging extension eventually supports iframes. However, debugging iframes is only supported in the Debugger for Firefox extension for now.
 
 Once Firefox starts up, you will have to go through the steps of allowing the `localhost:3000` certificate again and log into your Azure DevOps account. From now on, if you leave this Firefox window open, the debugger will reattach instead of starting a clean Firefox instance each time.
 
