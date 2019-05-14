@@ -54,6 +54,11 @@ export async function GetAllBranchesAsync(
     ...all.filter(x => favoritedFolders.some(f => x.startsWith(f))).map(x => x)
   );
 
+  // Filter out branches that are in a favorited folder
+  const allRemainder = all.filter(
+    x => !favoritedFolders.some(f => x.startsWith(f))
+  );
+
   if (defaultBranch) {
     results.set("Default", [defaultBranch]);
   }
@@ -62,12 +67,8 @@ export async function GetAllBranchesAsync(
     results.set("Favorites", favoritedRefs.sort());
   }
 
-  if (all.length > 0) {
-    // Filter out branches that are in a favorited folder
-    results.set(
-      "All",
-      all.filter(x => !favoritedFolders.some(f => x.startsWith(f))).sort()
-    );
+  if (allRemainder.length > 0) {
+    results.set("All", allRemainder.sort());
   }
 
   return results;
