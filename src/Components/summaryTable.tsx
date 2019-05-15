@@ -113,9 +113,9 @@ export class SummaryComponent extends React.Component<Props> {
           </span>
         }
         line2={
-          <span className="fontSizeMS font-size-ms secondary-text flex-row flex-center text-ellipsis">
+          <span className="font-size-ms secondary-text flex-row flex-center">
             <Link
-              className="monospaced-text text-ellipsis flex-row flex-center bolt-table-link bolt-table-inline-link"
+              className="monospaced-text flex-row flex-center bolt-table-link bolt-table-inline-link"
               excludeTabStop
               href={item.pullRequestUrl}
               target="_blank"
@@ -125,12 +125,10 @@ export class SummaryComponent extends React.Component<Props> {
                 iconName: "BranchPullRequest",
                 key: "pull-request"
               })}
-              <span className="text-ellipsis" key="release-type-text">
-                {`PR ${item.pullRequest!.pullRequestId}`}
-              </span>
+              {`PR ${item.pullRequest!.pullRequestId}`}
             </Link>
             <Link
-              className="monospaced-text text-ellipsis flex-row flex-center bolt-table-link bolt-table-inline-link"
+              className="monospaced-text flex-row flex-center bolt-table-link bolt-table-inline-link multi-line-td"
               excludeTabStop
               href={item.cherryPickUrl}
               target="_blank"
@@ -166,9 +164,9 @@ export class SummaryComponent extends React.Component<Props> {
           </span>
         }
         line2={
-          <span className="fontSizeMS font-size-ms text-ellipsis secondary-text">
+          <span className="font-size-ms secondary-text flex-row flex-center">
             <Link
-              className="monospaced-text text-ellipsis flex-row flex-center bolt-table-link bolt-table-inline-link"
+              className="monospaced-text flex-row flex-center bolt-table-link bolt-table-inline-link multi-line-td"
               excludeTabStop
               href={item.cherryPickUrl}
               target="_blank"
@@ -208,9 +206,9 @@ export class SummaryComponent extends React.Component<Props> {
           </span>
         }
         line2={
-          <div className="font-size-ms text-ellipsis secondary-text monospaced-text flex-row flex-center scroll-hidden">
+          <div className="font-size-ms text-ellipsis secondary-text monospaced-text flex-row flex-center scroll-hidden multi-line-td">
             <Tooltip overflowOnly={true}>
-              <span className="text-ellipsis">{item.error}</span>
+              <span>{item.error}</span>
             </Tooltip>
           </div>
         }
