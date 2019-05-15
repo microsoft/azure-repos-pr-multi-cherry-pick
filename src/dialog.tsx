@@ -83,7 +83,8 @@ class DialogContent extends React.Component<{}, IDialogState> {
   };
 
   turnOnErrorMessage = (id: string, errorMessage: string) => {
-    const rowIndex = findIndex(id, this.state.targets);
+    const { targets } = this.state;
+    const rowIndex = findIndex(id, targets);
 
     this.setState(prevState => {
       prevState.targets[rowIndex].errorMessage = errorMessage;
@@ -97,7 +98,8 @@ class DialogContent extends React.Component<{}, IDialogState> {
   };
 
   turnOffErrorMessage = (id: string) => {
-    const rowIndex = findIndex(id, this.state.targets);
+    const { targets } = this.state;
+    const rowIndex = findIndex(id, targets);
 
     this.setState(prevState => {
       prevState.targets[rowIndex].errorMessage = "";
@@ -173,18 +175,18 @@ class DialogContent extends React.Component<{}, IDialogState> {
   }
 
   onCreate = async () => {
-    const { pullRequest, ready } = this.state;
+    const { pullRequest, targets } = this.state;
 
     this.setState({
       loading: true
     });
 
-    if (!this.state.targets || !pullRequest) {
+    if (!targets || !pullRequest) {
       return;
     }
 
     let allValid = true;
-    for (const target of this.state.targets) {
+    for (const target of targets) {
       const isValid = await ValidateTargetBranchesAsync(
         pullRequest.repository,
         target.topicBranch,
@@ -208,7 +210,7 @@ class DialogContent extends React.Component<{}, IDialogState> {
     }
 
     const results: IResult[] = [];
-    for (const target of this.state.targets) {
+    for (const target of targets) {
       const result = await this.processTargetAsync(target, pullRequest);
       results.push(result);
     }
@@ -226,7 +228,8 @@ class DialogContent extends React.Component<{}, IDialogState> {
       loading,
       results,
       errors,
-      buttonDisabled
+      buttonDisabled,
+      targets
     } = this.state;
 
     if (loading || !ready) {
@@ -260,9 +263,9 @@ class DialogContent extends React.Component<{}, IDialogState> {
         <div className="sample-panel flex-column flex-grow">
           <div className="flex-grow scroll-content">
             <FormView
-              targets={this.state.targets}
+              targets={targets}
               updateTargets={this.updateTargets}
-              pullRequest={this.state.pullRequest!}
+              pullRequest={pullRequest!}
               turnOffErrorMessage={this.turnOffErrorMessage}
             />
           </div>
