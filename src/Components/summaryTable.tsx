@@ -77,25 +77,13 @@ export class SummaryComponent extends React.Component<Props> {
     tableColumn: ITableColumn<IResult>,
     tableItem: IResult
   ): JSX.Element => {
-    if (tableItem.pullRequest !== undefined) {
-      return this.getPullRequestRow(
-        rowIndex,
-        columnIndex,
-        tableColumn,
-        tableItem
-      );
-    } else if (tableItem.cherryPick !== undefined) {
-      return this.getCherryPickRow(
-        rowIndex,
-        columnIndex,
-        tableColumn,
-        tableItem
-      );
+    if (tableItem.error) {
+      return this.getErrorRow(rowIndex, columnIndex, tableColumn, tableItem);
     }
-    return this.getErrorRow(rowIndex, columnIndex, tableColumn, tableItem);
+    return this.getSuccessRow(rowIndex, columnIndex, tableColumn, tableItem);
   };
 
-  getPullRequestRow = (
+  getSuccessRow = (
     rowIndex: number,
     columnIndex: number,
     tableColumn: ITableColumn<IResult>,
@@ -114,57 +102,22 @@ export class SummaryComponent extends React.Component<Props> {
         }
         line2={
           <span className="font-size-ms secondary-text flex-row flex-center">
-            <Link
-              className="monospaced-text flex-row flex-center bolt-table-link bolt-table-inline-link"
-              excludeTabStop
-              href={item.pullRequestUrl}
-              target="_blank"
-            >
-              {Icon({
-                className: "icon-margin",
-                iconName: "BranchPullRequest",
-                key: "pull-request"
-              })}
-              {`PR ${item.pullRequest!.pullRequestId}`}
-            </Link>
-            <Link
-              className="monospaced-text flex-row flex-center bolt-table-link bolt-table-inline-link multi-line-td"
-              excludeTabStop
-              href={item.cherryPickUrl}
-              target="_blank"
-            >
-              {Icon({
-                className: "icon-margin",
-                iconName: "OpenSource",
-                key: "branch-name"
-              })}
-              {trimStart(item.pullRequest!.sourceRefName, "refs/heads/")}
-            </Link>
-          </span>
-        }
-      />
-    );
-  };
+            {item.pullRequest && (
+              <Link
+                className="monospaced-text flex-row flex-center bolt-table-link bolt-table-inline-link"
+                excludeTabStop
+                href={item.pullRequestUrl}
+                target="_blank"
+              >
+                {Icon({
+                  className: "icon-margin",
+                  iconName: "BranchPullRequest",
+                  key: "pull-request"
+                })}
+                {`PR ${item.pullRequest!.pullRequestId}`}
+              </Link>
+            )}
 
-  getCherryPickRow = (
-    rowIndex: number,
-    columnIndex: number,
-    tableColumn: ITableColumn<IResult>,
-    item: IResult
-  ): JSX.Element => {
-    return (
-      <TwoLineTableCell
-        className="bolt-table-cell-content-with-inline-link summary-row"
-        key={"col-" + columnIndex}
-        columnIndex={columnIndex}
-        tableColumn={tableColumn}
-        line1={
-          <span className="flex-row scroll-hidden">
-            Cherry-pick and branch created successfully
-          </span>
-        }
-        line2={
-          <span className="font-size-ms secondary-text flex-row flex-center">
             <Link
               className="monospaced-text flex-row flex-center bolt-table-link bolt-table-inline-link multi-line-td"
               excludeTabStop
@@ -193,7 +146,6 @@ export class SummaryComponent extends React.Component<Props> {
     tableColumn: ITableColumn<IResult>,
     item: IResult
   ): JSX.Element => {
-    // TODO: If there's an error, display that information
     return (
       <TwoLineTableCell
         className="bolt-table-cell-content-with-inline-link summary-row"
