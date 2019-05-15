@@ -119,7 +119,7 @@ class DialogContent extends React.Component<{}, IDialogState> {
 
   async processTargetAsync(
     target: ICherryPickTarget,
-    pullRequestNew: GitPullRequest
+    pullRequestContext: GitPullRequest
   ): Promise<IResult> {
     try {
       const result: IResult = {};
@@ -127,7 +127,7 @@ class DialogContent extends React.Component<{}, IDialogState> {
 
       // Create cherry-pick
       const cherryPickResult = await CherryPickCommitsAsync(
-        pullRequestNew,
+        pullRequestContext,
         target.topicBranch,
         target.targetBranch
       );
@@ -149,7 +149,7 @@ class DialogContent extends React.Component<{}, IDialogState> {
 
       const createdPrResult = await CreatePullRequestAsync(
         cherryPickResult.result,
-        pullRequestNew,
+        pullRequestContext,
         target.topicBranch,
         target.targetBranch,
         pullRequest.repository
