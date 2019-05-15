@@ -123,7 +123,6 @@ class DialogContent extends React.Component<{}, IDialogState> {
   ): Promise<IResult> {
     try {
       const result: IResult = {};
-      const { pullRequest } = this.state;
 
       // Create cherry-pick
       const cherryPickResult = await CherryPickCommitsAsync(
