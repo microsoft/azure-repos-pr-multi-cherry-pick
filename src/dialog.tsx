@@ -75,6 +75,7 @@ class DialogContent extends React.Component<{}, IDialogState> {
 
   updateTargets = (newTargets: ICherryPickTarget[]) => {
     const emptyValues = checkValuesPopulated(newTargets);
+
     this.setState({
       targets: newTargets,
       buttonDisabled: emptyValues
@@ -89,6 +90,7 @@ class DialogContent extends React.Component<{}, IDialogState> {
       prevState.targets[rowIndex].error = true;
       return prevState;
     });
+
     this.setState({
       errors: true
     });
@@ -261,6 +263,7 @@ class DialogContent extends React.Component<{}, IDialogState> {
               targets={this.state.targets}
               updateTargets={this.updateTargets}
               pullRequest={this.state.pullRequest!}
+              turnOffErrorMessage={this.turnOffErrorMessage}
             />
           </div>
           <ButtonGroup className="sample-panel-button-bar">

@@ -44,6 +44,7 @@ interface Props {
   targets: ICherryPickTarget[];
   pullRequest: GitPullRequest;
   updateTargets: (newTargets: ICherryPickTarget[]) => void;
+  turnOffErrorMessage: (id: string) => void;
 }
 
 interface FormState {
@@ -113,14 +114,21 @@ export class FormView extends React.Component<Props, FormState> {
   };
 
   handleDropdownChange = (newValue: IListBoxItem<{}>, id: string) => {
-    const { targets } = this.props;
+    const { targets, turnOffErrorMessage } = this.props;
     const rowIndex = findIndex(id, targets);
+    const newTargets = [...this.props.targets];
     const targetBranchName = newValue.text || "";
     let generatedTopicBranchName = trimStart(
       `${this.props.pullRequest.sourceRefName}-on-${targetBranchName}`,
       "refs/heads/"
     );
 
+    //Turn off any error messages
+    if (newTargets[rowIndex].error) {
+      turnOffErrorMessage(id);
+    }
+
+    //Update topic branch name
     let count = 1;
     while (
       targets.some(target => target.topicBranch === generatedTopicBranchName)
@@ -133,8 +141,6 @@ export class FormView extends React.Component<Props, FormState> {
       );
       count++;
     }
-
-    const newTargets = this.props.targets.splice(0);
 
     newTargets[rowIndex].targetBranch = targetBranchName;
     newTargets[rowIndex].topicBranch = generatedTopicBranchName;
