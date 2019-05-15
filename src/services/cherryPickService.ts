@@ -76,6 +76,16 @@ export async function CherryPickCommitsAsync(
     }
 
     if (cherryPick.status !== GitAsyncOperationStatus.Completed) {
+      if (
+        cherryPick.detailedStatus.conflict &&
+        cherryPick.detailedStatus.currentCommitId
+      ) {
+        return {
+          error: `There were conflicts when cherry-picking commit ${
+            cherryPick.detailedStatus.currentCommitId
+          }. This operation needs to be done locally.`
+        };
+      }
       return { error: cherryPick.detailedStatus.failureMessage };
     }
 
