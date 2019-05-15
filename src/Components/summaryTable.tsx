@@ -97,7 +97,9 @@ export class SummaryComponent extends React.Component<Props> {
         tableColumn={tableColumn}
         line1={
           <span className="flex-row scroll-hidden">
-            Cherry-pick and pull request created successfully
+            {item.pullRequest
+              ? "Cherry-pick and pull request created successfully"
+              : "Cherry-pick and branch created successfully"}
           </span>
         }
         line2={
