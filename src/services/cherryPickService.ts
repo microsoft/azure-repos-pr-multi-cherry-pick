@@ -101,11 +101,52 @@ export async function CreatePullRequestAsync(
   cherryPick: GitCherryPick,
   pullRequest: GitPullRequest,
   topicBranchName: string,
-  targetBranchName: string
+  targetBranchName: string,
+  repository: GitRepository
 ): Promise<IRestClientResult<GitPullRequest>> {
   try {
     if (cherryPick.status !== GitAsyncOperationStatus.Completed) {
       throw new Error("Cherry-pick operation is not completed");
+    }
+
+    let sourceRefName = topicBranchName;
+    if (!sourceRefName.startsWith("refs/heads")) {
+      sourceRefName = `refs/heads/${sourceRefName}`;
+    }
+
+    let targetRefName = targetBranchName;
+    if (!targetRefName.startsWith("refs/heads")) {
+      targetRefName = `refs/heads/${targetRefName}`;
+    }
+
+    //Check that target topic branch doesnt have any open PR's
+    const targetRefrence: GitPullRequestSearchCriteria = {
+      targetRefName: targetRefName,
+      creatorId: "",
+      includeLinks: false,
+      repositoryId: repository.id,
+      reviewerId: "",
+      sourceRefName: sourceRefName,
+      sourceRepositoryId: "",
+      status: PullRequestStatus.Active
+    };
+
+    const pullRequests = await client.getPullRequestsByProject(
+      repository.project.id,
+      targetRefrence
+    );
+
+    if (pullRequests !== undefined && pullRequests.length > 0) {
+      if (pullRequests.length == 1) {
+        return {
+          result: pullRequests.pop()
+        };
+      } else {
+        return {
+          error:
+            "Internal azure devops error: multiple PR's exist between target and topic branches"
+        };
+      }
     }
 
     const completionOptions: any = {
@@ -174,38 +215,6 @@ export async function ValidateTargetBranchesAsync(
       error: `Target topic branch already exists`,
       result: false
     };
-  }
-
-  //Check that target topic branch doesnt have any open PR's
-  if (!targetTopicBranchName.startsWith("refs/heads/")) {
-    targetTopicBranchName = `refs/heads/${targetTopicBranchName}`;
-  }
-
-  const targetRefrence: GitPullRequestSearchCriteria = {
-    targetRefName: "",
-    creatorId: "",
-    includeLinks: false,
-    repositoryId: repository.id,
-    reviewerId: "",
-    sourceRefName: targetTopicBranchName,
-    sourceRepositoryId: "",
-    status: PullRequestStatus.Active
-  };
-
-  try {
-    const pullRequests = await client.getPullRequestsByProject(
-      repository.project.id,
-      targetRefrence
-    );
-
-    if (pullRequests !== undefined && pullRequests.length > 0) {
-      return {
-        error: `Topic branch has a previously open PR, please delete or rename`,
-        result: false
-      };
-    }
-  } catch (ex) {
-    return { error: ex, result: false };
   }
 
   return {

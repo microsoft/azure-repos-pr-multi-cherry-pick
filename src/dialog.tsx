@@ -119,14 +119,15 @@ class DialogContent extends React.Component<{}, IDialogState> {
 
   async processTargetAsync(
     target: ICherryPickTarget,
-    pullRequest: GitPullRequest
+    pullRequestNew: GitPullRequest
   ): Promise<IResult> {
     try {
       const result: IResult = {};
+      const { pullRequest } = this.state;
 
       // Create cherry-pick
       const cherryPickResult = await CherryPickCommitsAsync(
-        pullRequest,
+        pullRequestNew,
         target.topicBranch,
         target.targetBranch
       );
@@ -142,15 +143,16 @@ class DialogContent extends React.Component<{}, IDialogState> {
       result.cherryPickUrl = formatCherryPickUrl(cherryPickResult.result);
 
       // If !CreatePr -> continue to next target
-      if (!target.createPr) {
+      if (!target.createPr || !pullRequest) {
         return result;
       }
 
       const createdPrResult = await CreatePullRequestAsync(
         cherryPickResult.result,
-        pullRequest,
+        pullRequestNew,
         target.topicBranch,
-        target.targetBranch
+        target.targetBranch,
+        pullRequest.repository
       );
 
       if (createdPrResult.error || !createdPrResult.result) {
