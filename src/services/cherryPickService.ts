@@ -18,7 +18,7 @@ import { IRestClientResult } from "../interfaces";
 const client: GitRestClient = getClient(GitRestClient);
 
 export async function CherryPickCommitsAsync(
-  pullRequest: GitPullRequest,
+  pullRequestContext: GitPullRequest,
   targetTopicBranchName: string,
   targetBranchName: string
 ): Promise<IRestClientResult<GitCherryPick>> {
@@ -32,20 +32,20 @@ export async function CherryPickCommitsAsync(
     }
 
     const cherryPickSource: any = {
-      pullRequestId: pullRequest.pullRequestId
+      pullRequestId: pullRequestContext.pullRequestId
     };
 
     const cherryPickRequestParams: GitAsyncRefOperationParameters = {
       generatedRefName: targetTopicBranchName,
       ontoRefName: targetBranchName,
-      repository: pullRequest.repository,
+      repository: pullRequestContext.repository,
       source: cherryPickSource
     };
 
     let cherryPick: GitCherryPick = await client.createCherryPick(
       cherryPickRequestParams,
-      pullRequest.repository.project.id,
-      pullRequest.repository.id
+      pullRequestContext.repository.project.id,
+      pullRequestContext.repository.id
     );
 
     // Check for new status every second
@@ -60,9 +60,9 @@ export async function CherryPickCommitsAsync(
       await new Promise(resolve => setTimeout(resolve, intervalMs));
 
       cherryPick = await client.getCherryPick(
-        pullRequest.repository.project.id,
+        pullRequestContext.repository.project.id,
         cherryPick.cherryPickId,
-        pullRequest.repository.id
+        pullRequestContext.repository.id
       );
 
       inProgress =
@@ -99,10 +99,9 @@ export async function CherryPickCommitsAsync(
 
 export async function CreatePullRequestAsync(
   cherryPick: GitCherryPick,
-  pullRequest: GitPullRequest,
+  pullRequestContext: GitPullRequest,
   topicBranchName: string,
-  targetBranchName: string,
-  repository: GitRepository
+  targetBranchName: string
 ): Promise<IRestClientResult<GitPullRequest>> {
   try {
     if (cherryPick.status !== GitAsyncOperationStatus.Completed) {
@@ -120,11 +119,11 @@ export async function CreatePullRequestAsync(
     }
 
     //Check that target topic branch doesnt have any open PR's
-    const targetRefrence: GitPullRequestSearchCriteria = {
+    const prSearchCriteria: GitPullRequestSearchCriteria = {
       targetRefName: targetRefName,
       creatorId: "",
       includeLinks: false,
-      repositoryId: repository.id,
+      repositoryId: pullRequestContext.repository.id,
       reviewerId: "",
       sourceRefName: sourceRefName,
       sourceRepositoryId: "",
@@ -132,21 +131,14 @@ export async function CreatePullRequestAsync(
     };
 
     const pullRequests = await client.getPullRequestsByProject(
-      repository.project.id,
-      targetRefrence
+      pullRequestContext.repository.project.id,
+      prSearchCriteria
     );
 
-    if (pullRequests !== undefined && pullRequests.length > 0) {
-      if (pullRequests.length == 1) {
-        return {
-          result: pullRequests.pop()
-        };
-      } else {
-        return {
-          error:
-            "Internal azure devops error: multiple PR's exist between target and topic branches"
-        };
-      }
+    if (pullRequests && pullRequests.length > 0) {
+      return {
+        result: pullRequests[0]
+      };
     }
 
     const completionOptions: any = {
@@ -160,13 +152,13 @@ export async function CreatePullRequestAsync(
       targetRefName: `refs/heads/${targetBranchName}`,
       completionOptions: completionOptions,
       title: `Multi-Cherry-Picks: Merge ${topicBranchName} to ${targetBranchName}`,
-      description: pullRequest.description
+      description: pullRequestContext.description
     };
 
     const pr: GitPullRequest = await client.createPullRequest(
       pullRequestToCreate,
-      pullRequest.repository.id,
-      pullRequest.repository.project.id
+      pullRequestContext.repository.id,
+      pullRequestContext.repository.project.id
     );
 
     return { result: pr };

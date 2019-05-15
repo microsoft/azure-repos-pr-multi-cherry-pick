@@ -143,7 +143,7 @@ class DialogContent extends React.Component<{}, IDialogState> {
       result.cherryPickUrl = formatCherryPickUrl(cherryPickResult.result);
 
       // If !CreatePr -> continue to next target
-      if (!target.createPr || !pullRequest) {
+      if (!target.createPr) {
         return result;
       }
 
@@ -151,8 +151,7 @@ class DialogContent extends React.Component<{}, IDialogState> {
         cherryPickResult.result,
         pullRequestContext,
         target.topicBranch,
-        target.targetBranch,
-        pullRequest.repository
+        target.targetBranch
       );
 
       if (createdPrResult.error || !createdPrResult.result) {
