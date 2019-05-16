@@ -41,7 +41,7 @@ You will need:
 
 ### **Prereq: Organization permission level**
 
-- To develop and test the extension you will need an organization where you have permission to install extensions to (i.e. you are the owner).
+- To develop and test the extension, you will need an organization in which you have permission to install extensions (e.g. you are the owner).
 - If you don't have a personal organization, you can [create an organization for free](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops).
 
 ### **Prereq: Node and NPM**
