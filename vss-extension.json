@@ -27,9 +27,15 @@
   "tags": ["Repos", "PR", "Cherry-pick"],
   "repository": {
     "type": "git",
-    "uri": "https://dev.azure.com/1es-cat/Office/_git/azure-repos-pr-cherry-picks"
+    "uri": "https://github.com/microsoft/azure-repos-pr-multi-cherry-pick"
   },
   "links": {
+    "repository": {
+      "uri": "https://github.com/microsoft/azure-repos-pr-multi-cherry-pick"
+    },
+    "issues": {
+      "uri": "https://github.com/microsoft/azure-repos-pr-multi-cherry-pick/issues"
+    },
     "support": {
       "uri": "mailto:1es-lighthouse-eng@microsoft.com"
     }
