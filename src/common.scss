@@ -122,9 +122,8 @@ body {
   padding-bottom: 16px !important;
 }
 
-.font-size-ms.text-ellipsis.secondary-text.monospaced-text.flex-row.flex-center.scroll-hidden
-  > .text-ellipsis {
-  white-space: pre-wrap !important;
+.multi-line-td {
+  white-space: pre-wrap;
 }
 
 .branch-folder {
