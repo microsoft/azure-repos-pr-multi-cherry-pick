@@ -4,7 +4,7 @@
 [![Release Status](https://vsrm.dev.azure.com/1es-cat/_apis/public/Release/badge/a185aa03-7d78-4c7d-b5fb-f7d997b096f9/1/1)](https://dev.azure.com/1es-cat/azure-repos-pr-multi-cherry-pick/_release?definitionId=1)
 
 This tool offers an easy way to use the git cherry-pick operation to apply changes to multiple branches.
-For each branch indicated, a new topic branch will be created with the applied changes.
+For each branch selected, a new topic branch will be created with the applied changes.
 If the **Pull request** option is selected, a pull request will be opened to the target branch.
 
 <img width="434" alt="Screen Shot 2019-05-13 at 1 00 27 PM" src="https://user-images.githubusercontent.com/19557880/57650379-87229e00-757f-11e9-8966-e00bb5416c8f.png"><img width="436" alt="Screen Shot 2019-05-13 at 1 00 46 PM" src="https://user-images.githubusercontent.com/19557880/57650380-87229e00-757f-11e9-9143-549002959cea.png">
@@ -14,14 +14,14 @@ If the **Pull request** option is selected, a pull request will be opened to the
 1. Install the extension from the [marketplace](https://marketplace.visualstudio.com/items?itemName=1eslighthouseinternal.pr-multi-cherry-pick-dev&ssr=false#overview) into your Azure DevOps organization.
 2. Navigate to your pull request.
 3. Select the context menu (...)
-4. Select **Multi cherry-pick**.
+4. Select **Multi-cherry-pick**.
 
 <p style="padding-left:25px">
 <img width="409" alt="Screen Shot 2019-05-10 at 4 20 10 PM" src="https://user-images.githubusercontent.com/19557880/57596172-1a1af400-74fe-11e9-8c0d-18291d20590a.png">
 </p>
 
 5. Add as many cherry-pick targets as you would like.
-6. After clicking **Complete** a summary page will appear with links to branches and PR's created from the tool.
+6. After you click **Complete**, a summary page will appear with links to branches and PRs created from the tool.
 
 ## Technologies used to develop the extension
 
@@ -70,7 +70,7 @@ To install npm separately and verify that it installed properly:
 npm -v
 ```
 
-Note: On Windows, if it's still returning npm 2.x, run `where npm`. Notice hits in program files. Rename those two npm files and the 5.6.0 in AppData will win.
+**Note:** On Windows, if it's still returning npm 2.x, run `where npm`. Notice hits in program files. Rename those two npm files and the 5.6.0 in AppData will win.
 
 ### **Prereq: Create a publisher**
 
@@ -91,14 +91,14 @@ npm install
 
 ### **Build the Extension**
 
-This extension uses webpack for bundling, webpack-dev-server for watching files and serving bundles during development.
-Two bundles are defined for webpack, one for the main dialog, one for the extension context menu registration.
-All actions can be triggered using npm scripts (`npm run <target>`), no additional task runner required.
+This extension uses webpack for bundling and webpack-dev-server for watching files and serving bundles during development.
+Two bundles are defined for webpack: one for the main dialog and one for the extension context menu registration.
+All actions can be triggered using npm scripts (`npm run <target>`) with no additional task runner required.
 
 ### **Deploy the Extension**
 
-You will need to deploy your extension to the marketplace at least once so that you can share it with your desired organization
-and install it. In order to do this you will need to generate a personal access token (PAT), learn how to do that [here](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops). When creating your PAT, under **Organization**, select **All accessible organizations**, and set the **Marketplace** scope to **Publish**.
+You will need to deploy your extension to the marketplace at least once so that you can share it with your organization
+and install it. In order to do this, you will need to generate a personal access token (PAT). Learn how to do that [here](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops). When creating your PAT, under **Organization**, select **All accessible organizations**, and set the **Marketplace** scope to **Publish**.
 
 Then run once, inserting your PAS into [token]:
 
@@ -122,7 +122,9 @@ Although most code changes will be reflected immediately, you may still need to 
 
 ### **Configure your VS Code project to debug against Azure DevOps**
 
-In VS Code, press **F5** to start debugging (making sure the webpack-dev-server is still running). The default launch configuration should be set to Firefox. Chrome configurations are included in the sample as well in case the Chrome debugging extension eventually supports iframes. However, debugging iframes is only supported in the Debugger for Firefox extension for now.
+In VS Code, press **F5** to start debugging (making sure the webpack-dev-server is still running). The default launch configuration should be set to **Firefox**. 
+
+**Note**: Chrome configurations are included in the sample as well in case the Chrome debugging extension eventually supports iframes. However, debugging iframes is only supported in the Debugger for Firefox extension for now.
 
 Once Firefox starts up, you will have to go through the steps of allowing the `localhost:3000` certificate again and log into your Azure DevOps account. From now on, if you leave this Firefox window open, the debugger will reattach instead of starting a clean Firefox instance each time.
 
