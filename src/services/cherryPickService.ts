@@ -147,17 +147,18 @@ export async function CreatePullRequestAsync(
     );
 
     if (pullRequests && pullRequests.length > 0) {
-      pullRequests[0].description = "wohoo@";
-      //pullRequests[0].description + "/n " + pullRequestContext.description;
+      var updatedDescription: any = {
+        description: `${pullRequests[0].description}
+           ${pullRequestContext.description}`
+      };
 
       //Update PR
       const updatedPullRequest = await client.updatePullRequest(
-        pullRequests[0],
+        updatedDescription,
         pullRequests[0].repository.id,
         pullRequests[0].pullRequestId
       );
 
-      var test;
       //Return current PR
       return {
         result: updatedPullRequest
@@ -186,7 +187,6 @@ export async function CreatePullRequestAsync(
 
     return { result: pr };
   } catch (ex) {
-    console.log(ex);
     return { error: ex };
   }
 }
