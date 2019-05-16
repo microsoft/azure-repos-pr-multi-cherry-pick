@@ -148,8 +148,9 @@ export async function CreatePullRequestAsync(
 
     if (pullRequests && pullRequests.length > 0) {
       var updatedDescription: any = {
-        description: `${pullRequests[0].description}
-           ${pullRequestContext.description}`
+        description: `${pullRequestContext.description}
+        ------------------------------------------------------------------------------------------------------------
+        ${pullRequests[0].description}`
       };
 
       //Update PR
