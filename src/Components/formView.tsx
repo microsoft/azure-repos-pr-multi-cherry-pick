@@ -8,10 +8,7 @@ import { TextField, TextFieldWidth } from "azure-devops-ui/TextField";
 import { Guid } from "../utilities";
 import { Checkbox } from "azure-devops-ui/Checkbox";
 import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
-import {
-  ObservableValue,
-  IObservableArrayEventArgs
-} from "azure-devops-ui/Core/Observable";
+import { ObservableValue } from "azure-devops-ui/Core/Observable";
 import { ICherryPickTarget } from "../interfaces";
 import { Dropdown } from "azure-devops-ui/Dropdown";
 import { DropdownSelection } from "azure-devops-ui/Utilities/DropdownSelection";
@@ -39,6 +36,7 @@ import {
 import { GetAllBranchesAsync } from "../services/gitBranchService";
 import { GitPullRequest } from "azure-devops-extension-api/Git";
 import { ButtonGroup } from "azure-devops-ui/ButtonGroup";
+import { Icon } from "azure-devops-ui/Icon";
 
 interface Props {
   targets: ICherryPickTarget[];
@@ -169,6 +167,36 @@ export class FormView extends React.Component<Props, FormState> {
     true
   );
 
+  renderDropdownRow = <T extends {}>(
+    rowIndex: number,
+    columnIndex: number,
+    tableColumn: ITableColumn<IListBoxItem<T>>,
+    tableItem: IListBoxItem<T>
+  ): JSX.Element => {
+    // If there's no path separator, this will return -1
+    const lastIndex = tableItem.text!.lastIndexOf("/");
+    // If this is -1, branch folder will just be an empty string
+    const branchFolder = tableItem.text!.substring(0, lastIndex + 1);
+    const branchName = tableItem.text!.substring(lastIndex + 1);
+
+    return (
+      <SimpleTableCell
+        columnIndex={columnIndex}
+        tableColumn={tableColumn}
+        key={"col-" + columnIndex}
+        contentClassName="font-size-m scroll-hidden text-ellipsis"
+      >
+        {Icon({
+          className: "icon-margin",
+          iconName: "OpenSource",
+          key: "branch-name"
+        })}
+        <span className="branch-folder">{branchFolder}</span>
+        <span className="branch-name">{branchName}</span>
+      </SimpleTableCell>
+    );
+  };
+
   private onLoadingMount = async () => {
     if (!this.state.loading.value) {
       // Set loading to true once we start fetching items, this will announce
@@ -204,7 +232,8 @@ export class FormView extends React.Component<Props, FormState> {
               id: x,
               text: trimStart(x, "refs/heads/"),
               groupId: groupId,
-              iconProps: { iconName: "OpenSource" }
+              iconProps: { iconName: "OpenSource" },
+              render: this.renderDropdownRow
             };
           })
         );

@@ -126,3 +126,11 @@ body {
   > .text-ellipsis {
   white-space: pre-wrap !important;
 }
+
+.branch-folder {
+  color: $secondary-text;
+}
+
+.branch-name {
+  color: $primary-text;
+}
