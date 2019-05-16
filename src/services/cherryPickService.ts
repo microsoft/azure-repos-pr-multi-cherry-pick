@@ -87,7 +87,18 @@ export async function CherryPickCommitsAsync(
             cherryPick.detailedStatus.currentCommitId
           }. This operation needs to be done locally.`
         };
+      } else if (
+        cherryPick.detailedStatus.failureMessage.toLowerCase() ===
+        "invalidrefname"
+      ) {
+        return {
+          error: `Invalid branch name: ${trimStart(
+            targetTopicBranchName,
+            "refs/heads/"
+          )}`
+        };
       }
+
       return { error: cherryPick.detailedStatus.failureMessage };
     }
 

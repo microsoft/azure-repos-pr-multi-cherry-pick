@@ -44,27 +44,24 @@ interface Props {
   targets: ICherryPickTarget[];
   pullRequest: GitPullRequest;
   updateTargets: (newTargets: ICherryPickTarget[]) => void;
+  turnOffErrorMessage: (id: string) => void;
 }
 
 interface FormState {
   loading: ObservableValue<boolean>;
-  test: boolean;
 }
 
 export class FormView extends React.Component<Props, FormState> {
   constructor(props: any) {
     super(props);
     this.state = {
-      loading: new ObservableValue<boolean>(false),
-      test: true
+      loading: new ObservableValue<boolean>(false)
     };
   }
 
   componentWillReceiveProps(prevProps: Props, prevState: FormState) {
     if (prevProps.targets !== this.props.targets) {
-      this.setState({
-        //test: true
-      });
+      this.setState({});
     }
   }
 
@@ -78,33 +75,36 @@ export class FormView extends React.Component<Props, FormState> {
       errorMessage: "",
       selection: new DropdownSelection()
     };
-
-    let newTargets = this.props.targets.splice(0);
+    const { targets } = this.props;
+    let newTargets = [...targets];
     newTargets.push(newTarget);
     this.props.updateTargets(newTargets);
   };
 
   removeItem = (id: string) => (menuItem: IMenuItem, event?: any) => {
-    const rowIndex = findIndex(id, this.props.targets);
+    const { targets } = this.props;
+    const rowIndex = findIndex(id, targets);
 
-    if (rowIndex != 0 || this.props.targets.length > 1) {
-      let newTargets = this.props.targets.splice(0);
+    if (rowIndex != 0 || targets.length > 1) {
+      let newTargets = [...targets];
       newTargets.splice(rowIndex, 1);
       this.props.updateTargets(newTargets);
     }
   };
 
   handlePRChange = (id: string) => (event: any, checked: boolean) => {
-    const rowIndex = findIndex(id, this.props.targets);
-    let newTargets = this.props.targets.splice(0);
+    const { targets } = this.props;
+    const rowIndex = findIndex(id, targets);
+    let newTargets = [...targets];
 
     newTargets[rowIndex].createPr = checked;
     this.props.updateTargets(newTargets);
   };
 
   handleInputTopicText = (newValue: string, id: string) => {
-    const rowIndex = findIndex(id, this.props.targets);
-    let newTargets = this.props.targets.splice(0);
+    const { targets } = this.props;
+    const rowIndex = findIndex(id, targets);
+    let newTargets = [...targets];
 
     newTargets[rowIndex].topicBranch = newValue;
     newTargets[rowIndex].error = false;
@@ -113,28 +113,31 @@ export class FormView extends React.Component<Props, FormState> {
   };
 
   handleDropdownChange = (newValue: IListBoxItem<{}>, id: string) => {
-    const { targets } = this.props;
+    const { targets, pullRequest } = this.props;
     const rowIndex = findIndex(id, targets);
     const targetBranchName = newValue.text || "";
+    let newTargets = [...targets];
     let generatedTopicBranchName = trimStart(
-      `${this.props.pullRequest.sourceRefName}-on-${targetBranchName}`,
+      `${pullRequest.sourceRefName}-on-${targetBranchName}`,
       "refs/heads/"
     );
 
+    //If target comes with any errors from the previous dropdown selection, clear out the error message
+    if (newTargets[rowIndex].error) {
+      this.props.turnOffErrorMessage(id);
+    }
+
+    //Update topic branch name
     let count = 1;
     while (
       targets.some(target => target.topicBranch === generatedTopicBranchName)
     ) {
       generatedTopicBranchName = trimStart(
-        `${
-          this.props.pullRequest.sourceRefName
-        }-on-${targetBranchName}-${count}`,
+        `${pullRequest.sourceRefName}-on-${targetBranchName}-${count}`,
         "refs/heads/"
       );
       count++;
     }
-
-    const newTargets = this.props.targets.splice(0);
 
     newTargets[rowIndex].targetBranch = targetBranchName;
     newTargets[rowIndex].topicBranch = generatedTopicBranchName;
@@ -170,17 +173,21 @@ export class FormView extends React.Component<Props, FormState> {
   );
 
   private onLoadingMount = async () => {
+    const { pullRequest } = this.props;
+
     if (!this.state.loading.value) {
       // Set loading to true once we start fetching items, this will announce
       // that loading has begun to screen readers.
-      this.state.loading.value = true;
+      this.setState(prevState => {
+        prevState.loading.value = true;
+        return prevState;
+      });
+
       //remove the loading item
       this.itemProviderGrouped.pop();
       var groupNames = ["Default", "Favorites", "All"];
 
-      const branches = await GetAllBranchesAsync(
-        this.props.pullRequest.repository
-      );
+      const branches = await GetAllBranchesAsync(pullRequest.repository);
 
       // Add Group Names
       for (let i = 0; i < groupNames.length; i++) {
@@ -211,7 +218,10 @@ export class FormView extends React.Component<Props, FormState> {
       }
 
       // Set loading to false to announce how many items have loaded to screen readers.
-      this.state.loading.value = false;
+      this.setState(prevState => {
+        prevState.loading.value = false;
+        return prevState;
+      });
     }
   };
 
@@ -333,7 +343,7 @@ export class FormView extends React.Component<Props, FormState> {
   ];
 
   public render(): JSX.Element {
-    var currentTargets = new ArrayItemProvider(this.props.targets);
+    const currentTargets = new ArrayItemProvider(this.props.targets);
 
     return (
       <div className="sample-panel flex-column flex-grow">
