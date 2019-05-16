@@ -1,5 +1,8 @@
 # Multi Cherry-Pick Tool
 
+[![Build Status](https://dev.azure.com/1es-cat/azure-repos-pr-multi-cherry-pick/_apis/build/status/microsoft.azure-repos-pr-multi-cherry-pick?branchName=master)](https://dev.azure.com/1es-cat/azure-repos-pr-multi-cherry-pick/_build/latest?definitionId=24&branchName=master)
+[![Release Status](https://vsrm.dev.azure.com/1es-cat/_apis/public/Release/badge/a185aa03-7d78-4c7d-b5fb-f7d997b096f9/1/1)](https://dev.azure.com/1es-cat/azure-repos-pr-multi-cherry-pick/_release?definitionId=1)
+
 This tool offers an easy way to use the git cherry-pick operation to apply changes to multiple branches.
 For each branch indicated, a new topic branch will be created with the applied changes.
 If the **Pull request** option is selected, a pull request will be opened to the target branch.
