@@ -286,6 +286,7 @@ export class FormView extends React.Component<Props, FormState> {
                             items={this.itemProviderGrouped}
                             loading={this.state.loading}
                             placeholder="Select a branch"
+                            filteredNoResultsText="No matching branch names found."
                             onSelect={(e, newValue) =>
                               this.handleDropdownChange(newValue, tableItem.id)
                             }
