@@ -7,7 +7,9 @@ import {
   GitAsyncRefOperationParameters,
   GitPullRequestMergeStrategy,
   GitAsyncOperationStatus,
-  GitRepository
+  GitRepository,
+  GitPullRequestSearchCriteria,
+  PullRequestStatus
 } from "azure-devops-extension-api/Git";
 
 import { Constants, trimStart } from "../utilities";
@@ -16,7 +18,7 @@ import { IRestClientResult } from "../interfaces";
 const client: GitRestClient = getClient(GitRestClient);
 
 export async function CherryPickCommitsAsync(
-  pullRequest: GitPullRequest,
+  pullRequestContext: GitPullRequest,
   targetTopicBranchName: string,
   targetBranchName: string
 ): Promise<IRestClientResult<GitCherryPick>> {
@@ -30,20 +32,20 @@ export async function CherryPickCommitsAsync(
     }
 
     const cherryPickSource: any = {
-      pullRequestId: pullRequest.pullRequestId
+      pullRequestId: pullRequestContext.pullRequestId
     };
 
     const cherryPickRequestParams: GitAsyncRefOperationParameters = {
       generatedRefName: targetTopicBranchName,
       ontoRefName: targetBranchName,
-      repository: pullRequest.repository,
+      repository: pullRequestContext.repository,
       source: cherryPickSource
     };
 
     let cherryPick: GitCherryPick = await client.createCherryPick(
       cherryPickRequestParams,
-      pullRequest.repository.project.id,
-      pullRequest.repository.id
+      pullRequestContext.repository.project.id,
+      pullRequestContext.repository.id
     );
 
     // Check for new status every second
@@ -58,9 +60,9 @@ export async function CherryPickCommitsAsync(
       await new Promise(resolve => setTimeout(resolve, intervalMs));
 
       cherryPick = await client.getCherryPick(
-        pullRequest.repository.project.id,
+        pullRequestContext.repository.project.id,
         cherryPick.cherryPickId,
-        pullRequest.repository.id
+        pullRequestContext.repository.id
       );
 
       inProgress =
@@ -108,7 +110,7 @@ export async function CherryPickCommitsAsync(
 
 export async function CreatePullRequestAsync(
   cherryPick: GitCherryPick,
-  pullRequest: GitPullRequest,
+  pullRequestContext: GitPullRequest,
   topicBranchName: string,
   targetBranchName: string
 ): Promise<IRestClientResult<GitPullRequest>> {
@@ -117,6 +119,65 @@ export async function CreatePullRequestAsync(
       throw new Error("Cherry-pick operation is not completed");
     }
 
+    let sourceRefName = topicBranchName;
+    if (!sourceRefName.startsWith("refs/heads")) {
+      sourceRefName = `refs/heads/${sourceRefName}`;
+    }
+
+    let targetRefName = targetBranchName;
+    if (!targetRefName.startsWith("refs/heads")) {
+      targetRefName = `refs/heads/${targetRefName}`;
+    }
+
+    //Check that target topic branch doesnt have any open PR's
+    const prSearchCriteria: GitPullRequestSearchCriteria = {
+      targetRefName: targetRefName,
+      creatorId: "",
+      includeLinks: false,
+      repositoryId: pullRequestContext.repository.id,
+      reviewerId: "",
+      sourceRefName: sourceRefName,
+      sourceRepositoryId: "",
+      status: PullRequestStatus.Active
+    };
+
+    const pullRequests = await client.getPullRequestsByProject(
+      pullRequestContext.repository.project.id,
+      prSearchCriteria
+    );
+
+    //If target topic branch has open PR
+    if (pullRequests && pullRequests.length > 0) {
+      const existingPullRequest = pullRequests[0];
+
+      //Append new description if one exists
+      if (existingPullRequest.description !== pullRequestContext.description) {
+        var updatedDescription: any = {
+          description: `${pullRequestContext.description}
+          ------------------------------
+          ${existingPullRequest.description}`
+        };
+
+        //Update PR
+        const updatedPullRequest = await client.updatePullRequest(
+          updatedDescription,
+          existingPullRequest.repository.id,
+          existingPullRequest.pullRequestId
+        );
+
+        //Return updated PR
+        return {
+          result: updatedPullRequest
+        };
+      } else {
+        //Return PR with no updates
+        return {
+          result: existingPullRequest
+        };
+      }
+    }
+
+    //Create a new PR if none previously existed
     const completionOptions: any = {
       deleteSourceBranch: true,
       mergeStrategy: GitPullRequestMergeStrategy.Squash,
@@ -128,16 +189,16 @@ export async function CreatePullRequestAsync(
       targetRefName: `refs/heads/${targetBranchName}`,
       completionOptions: completionOptions,
       title: `Multi-Cherry-Picks: Merge ${topicBranchName} to ${targetBranchName}`,
-      description: pullRequest.description
+      description: pullRequestContext.description
     };
 
-    const pr: GitPullRequest = await client.createPullRequest(
+    const newPullRequest: GitPullRequest = await client.createPullRequest(
       pullRequestToCreate,
-      pullRequest.repository.id,
-      pullRequest.repository.project.id
+      pullRequestContext.repository.id,
+      pullRequestContext.repository.project.id
     );
 
-    return { result: pr };
+    return { result: newPullRequest };
   } catch (ex) {
     return { error: ex };
   }
