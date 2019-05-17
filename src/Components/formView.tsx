@@ -114,9 +114,11 @@ export class FormView extends React.Component<Props, FormState> {
     const { targets, pullRequest } = this.props;
     const rowIndex = findIndex(id, targets);
     const targetBranchName = newValue.text || "";
-    let newTargets = [...targets];
+    const newTargets = [...targets];
+
+    const sanitizedTargetSuffix = targetBranchName.replace(/\//g, "-");
     let generatedTopicBranchName = trimStart(
-      `${pullRequest.sourceRefName}-on-${targetBranchName}`,
+      `${pullRequest.sourceRefName}-on-${sanitizedTargetSuffix}`,
       "refs/heads/"
     );
 
@@ -131,7 +133,7 @@ export class FormView extends React.Component<Props, FormState> {
       targets.some(target => target.topicBranch === generatedTopicBranchName)
     ) {
       generatedTopicBranchName = trimStart(
-        `${pullRequest.sourceRefName}-on-${targetBranchName}-${count}`,
+        `${pullRequest.sourceRefName}-on-${sanitizedTargetSuffix}-${count}`,
         "refs/heads/"
       );
       count++;
