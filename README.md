@@ -11,7 +11,7 @@ If the **Pull request** option is selected, a pull request will be opened to the
 
 ## Quick steps to get started using the tool
 
-1. Install the extension from the [marketplace](https://marketplace.visualstudio.com/items?itemName=1eslighthouseinternal.pr-multi-cherry-pick-dev&ssr=false#overview) into your Azure DevOps organization.
+1. Install the extension from the [marketplace](https://marketplace.visualstudio.com/items?itemName=1ESLighthouseEng.pr-multi-cherry-pick) into your Azure DevOps organization.
 2. Navigate to your pull request.
 3. Select the context menu (...)
 4. Select **Multi-cherry-pick**.
