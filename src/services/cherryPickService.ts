@@ -146,15 +146,15 @@ export async function CreatePullRequestAsync(
       prSearchCriteria
     );
 
+    //If target topic branch has open PR
     if (pullRequests && pullRequests.length > 0) {
-          const existingPullRequest = pullRequests[0];
+      const existingPullRequest = pullRequests[0];
 
+      //Append new description if one exists
       if (existingPullRequest.description !== pullRequestContext.description) {
         var updatedDescription: any = {
           description: `${pullRequestContext.description}
-
           ------------------------------
-
           ${existingPullRequest.description}`
         };
 
@@ -165,34 +165,19 @@ export async function CreatePullRequestAsync(
           existingPullRequest.pullRequestId
         );
 
-        //Return current PR
+        //Return updated PR
         return {
           result: updatedPullRequest
         };
       } else {
+        //Return PR with no updates
         return {
           result: existingPullRequest
         };
       }
-      var updatedDescription: any = {
-        description: `${pullRequestContext.description}
-        ------------------------------------------------------------------------------------------------------------
-        ${pullRequests[0].description}`
-      };
-
-      //Update PR
-      const updatedPullRequest = await client.updatePullRequest(
-        updatedDescription,
-        pullRequests[0].repository.id,
-        pullRequests[0].pullRequestId
-      );
-
-      //Return current PR
-      return {
-        result: updatedPullRequest
-      };
     }
 
+    //Create a new PR if none previously existed
     const completionOptions: any = {
       deleteSourceBranch: true,
       mergeStrategy: GitPullRequestMergeStrategy.Squash,
@@ -207,13 +192,13 @@ export async function CreatePullRequestAsync(
       description: pullRequestContext.description
     };
 
-    const pr: GitPullRequest = await client.createPullRequest(
+    const newPullRequest: GitPullRequest = await client.createPullRequest(
       pullRequestToCreate,
       pullRequestContext.repository.id,
       pullRequestContext.repository.project.id
     );
 
-    return { result: pr };
+    return { result: newPullRequest };
   } catch (ex) {
     return { error: ex };
   }
