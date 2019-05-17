@@ -147,6 +147,33 @@ export async function CreatePullRequestAsync(
     );
 
     if (pullRequests && pullRequests.length > 0) {
+          const existingPullRequest = pullRequests[0];
+
+      if (existingPullRequest.description !== pullRequestContext.description) {
+        var updatedDescription: any = {
+          description: `${pullRequestContext.description}
+
+          ------------------------------
+
+          ${existingPullRequest.description}`
+        };
+
+        //Update PR
+        const updatedPullRequest = await client.updatePullRequest(
+          updatedDescription,
+          existingPullRequest.repository.id,
+          existingPullRequest.pullRequestId
+        );
+
+        //Return current PR
+        return {
+          result: updatedPullRequest
+        };
+      } else {
+        return {
+          result: existingPullRequest
+        };
+      }
       var updatedDescription: any = {
         description: `${pullRequestContext.description}
         ------------------------------------------------------------------------------------------------------------
