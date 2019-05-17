@@ -23,7 +23,6 @@ interface Props {
 }
 export class SummaryComponent extends React.Component<Props> {
   private itemProvider = new ArrayItemProvider<IResult>(this.props.results);
-  private navService: IHostNavigationService | undefined;
 
   public render(): JSX.Element {
     return (
