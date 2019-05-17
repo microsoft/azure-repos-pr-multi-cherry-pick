@@ -1,6 +1,7 @@
 @import "node_modules/azure-devops-ui/Core/_platformCommon.scss";
-
 @import "node_modules/azure-devops-ui/Core/core.scss";
+
+$form-input-width: 400px;
 
 #root {
   height: 100%;
@@ -72,21 +73,18 @@ body {
 }
 
 .flex-column.bolt-textfield-default-width.bolt-textfield-default-width {
-  width: 100%;
+  width: $form-input-width;
   height: 100%;
 }
 
 .bolt-textfield-input.flex-grow {
-  width: 100%;
-  height: 100%;
+  width: $form-input-width;
 }
 
-.bolt-expandable-button {
-  display: flex;
-}
-
-.bolt-expandable-button > .bolt-button.enabled.bolt-focus-treatment {
-  width: 100%;
+.scroll-hidden
+  > .bolt-expandable-button
+  > .bolt-button.enabled.bolt-focus-treatment {
+  width: $form-input-width;
   height: 100%;
 }
 
@@ -124,4 +122,16 @@ body {
 
 .multi-line-td {
   white-space: pre-wrap;
+}
+
+.branch-folder {
+  color: $secondary-text;
+}
+
+.branch-name {
+  color: $primary-text;
+}
+
+.bolt-dropdown.flex-column.custom-scrollbar {
+  width: $form-input-width;
 }

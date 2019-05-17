@@ -8,10 +8,7 @@ import { TextField, TextFieldWidth } from "azure-devops-ui/TextField";
 import { Guid } from "../utilities";
 import { Checkbox } from "azure-devops-ui/Checkbox";
 import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
-import {
-  ObservableValue,
-  IObservableArrayEventArgs
-} from "azure-devops-ui/Core/Observable";
+import { ObservableValue } from "azure-devops-ui/Core/Observable";
 import { ICherryPickTarget } from "../interfaces";
 import { Dropdown } from "azure-devops-ui/Dropdown";
 import { DropdownSelection } from "azure-devops-ui/Utilities/DropdownSelection";
@@ -39,6 +36,7 @@ import {
 import { GetAllBranchesAsync } from "../services/gitBranchService";
 import { GitPullRequest } from "azure-devops-extension-api/Git";
 import { ButtonGroup } from "azure-devops-ui/ButtonGroup";
+import { Icon } from "azure-devops-ui/Icon";
 
 interface Props {
   targets: ICherryPickTarget[];
@@ -169,8 +167,38 @@ export class FormView extends React.Component<Props, FormState> {
   private itemProviderGrouped = new GroupedItemProvider(
     [this.loadingItem],
     [],
-    true
+    false
   );
+
+  renderDropdownRow = <T extends {}>(
+    rowIndex: number,
+    columnIndex: number,
+    tableColumn: ITableColumn<IListBoxItem<T>>,
+    tableItem: IListBoxItem<T>
+  ): JSX.Element => {
+    // If there's no path separator, this will return -1
+    const lastIndex = tableItem.text!.lastIndexOf("/");
+    // If this is -1, branch folder will just be an empty string
+    const branchFolder = tableItem.text!.substring(0, lastIndex + 1);
+    const branchName = tableItem.text!.substring(lastIndex + 1);
+
+    return (
+      <SimpleTableCell
+        columnIndex={columnIndex}
+        tableColumn={tableColumn}
+        key={"col-" + columnIndex}
+        contentClassName="font-size-m scroll-hidden text-ellipsis"
+      >
+        {Icon({
+          className: "icon-margin",
+          iconName: "OpenSource",
+          key: "branch-name"
+        })}
+        <span className="branch-folder">{branchFolder}</span>
+        <span className="branch-name">{branchName}</span>
+      </SimpleTableCell>
+    );
+  };
 
   private onLoadingMount = async () => {
     const { pullRequest } = this.props;
@@ -189,33 +217,47 @@ export class FormView extends React.Component<Props, FormState> {
 
       const branches = await GetAllBranchesAsync(pullRequest.repository);
 
-      // Add Group Names
+      const dropdownItems: IListBoxItem<{}>[] = [];
+
       for (let i = 0; i < groupNames.length; i++) {
+        const groupId = i.toString();
         const groupName = groupNames[i];
         const groupBranches = branches.get(groupName);
         if (!groupBranches) {
           continue;
         }
 
-        const groupId = i.toString();
-        this.itemProviderGrouped.pushGroups({
-          id: groupId,
-          name: groupName
-        });
+        if (i > 0) {
+          dropdownItems.push({
+            id: `${i}-divider`,
+            type: ListBoxItemType.Divider,
+            groupId: groupId
+          });
+        }
 
-        //Add Group Items
-        this.itemProviderGrouped.change(
-          this.itemProviderGrouped.value.length,
-          ...groupBranches.map(x => {
-            return {
-              id: x,
-              text: trimStart(x, "refs/heads/"),
-              groupId: groupId,
-              iconProps: { iconName: "OpenSource" }
-            };
-          })
+        dropdownItems.push(
+          ...[
+            {
+              id: `${groupId}-header`,
+              text: groupName,
+              type: ListBoxItemType.Header,
+              groupId: groupId
+            },
+            ...groupBranches.map(x => {
+              return {
+                id: x,
+                text: trimStart(x, "refs/heads/"),
+                groupId: groupId,
+                iconProps: { iconName: "OpenSource" },
+                render: this.renderDropdownRow
+              };
+            })
+          ]
         );
       }
+
+      // Add items to provider
+      this.itemProviderGrouped.change(0, ...dropdownItems);
 
       // Set loading to false to announce how many items have loaded to screen readers.
       this.setState(prevState => {
@@ -267,6 +309,7 @@ export class FormView extends React.Component<Props, FormState> {
                             items={this.itemProviderGrouped}
                             loading={this.state.loading}
                             placeholder="Select a branch"
+                            filteredNoResultsText="No matching branch names found."
                             onSelect={(e, newValue) =>
                               this.handleDropdownChange(newValue, tableItem.id)
                             }
