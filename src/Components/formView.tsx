@@ -164,7 +164,7 @@ export class FormView extends React.Component<Props, FormState> {
   private itemProviderGrouped = new GroupedItemProvider(
     [this.loadingItem],
     [],
-    true
+    false
   );
 
   renderDropdownRow = <T extends {}>(
@@ -202,6 +202,7 @@ export class FormView extends React.Component<Props, FormState> {
       // Set loading to true once we start fetching items, this will announce
       // that loading has begun to screen readers.
       this.state.loading.value = true;
+
       //remove the loading item
       this.itemProviderGrouped.pop();
       var groupNames = ["Default", "Favorites", "All"];
@@ -210,34 +211,47 @@ export class FormView extends React.Component<Props, FormState> {
         this.props.pullRequest.repository
       );
 
-      // Add Group Names
+      const dropdownItems: IListBoxItem<{}>[] = [];
+
       for (let i = 0; i < groupNames.length; i++) {
+        const groupId = i.toString();
         const groupName = groupNames[i];
         const groupBranches = branches.get(groupName);
         if (!groupBranches) {
           continue;
         }
 
-        const groupId = i.toString();
-        this.itemProviderGrouped.pushGroups({
-          id: groupId,
-          name: groupName
-        });
+        if (i > 0) {
+          dropdownItems.push({
+            id: `${i}-divider`,
+            type: ListBoxItemType.Divider,
+            groupId: groupId
+          });
+        }
 
-        //Add Group Items
-        this.itemProviderGrouped.change(
-          this.itemProviderGrouped.value.length,
-          ...groupBranches.map(x => {
-            return {
-              id: x,
-              text: trimStart(x, "refs/heads/"),
-              groupId: groupId,
-              iconProps: { iconName: "OpenSource" },
-              render: this.renderDropdownRow
-            };
-          })
+        dropdownItems.push(
+          ...[
+            {
+              id: `${groupId}-header`,
+              text: groupName,
+              type: ListBoxItemType.Header,
+              groupId: groupId
+            },
+            ...groupBranches.map(x => {
+              return {
+                id: x,
+                text: trimStart(x, "refs/heads/"),
+                groupId: groupId,
+                iconProps: { iconName: "OpenSource" },
+                render: this.renderDropdownRow
+              };
+            })
+          ]
         );
       }
+
+      // Add items to provider
+      this.itemProviderGrouped.change(0, ...dropdownItems);
 
       // Set loading to false to announce how many items have loaded to screen readers.
       this.state.loading.value = false;
