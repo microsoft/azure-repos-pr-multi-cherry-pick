@@ -27,9 +27,10 @@ export function trimStart(target: string, trim: string): string {
 export function formatPrUrl(item: GitPullRequest): string {
   const host = SDK.getHost();
 
-  const link = `https://dev.azure.com/${host.name}/${
-    item.repository.project.name
-  }/_git/${item.repository.name}/pullrequest/${item.pullRequestId}`;
+  const baseUrl = item.url.split("/_apis")[0];
+  const link = `${baseUrl}/_git/${item.repository.name}/pullrequest/${
+    item.pullRequestId
+  }`;
 
   return link;
 }
@@ -40,9 +41,10 @@ export function formatCherryPickUrl(item: GitCherryPick): string {
   let refName = trimStart(item.parameters.generatedRefName, "refs/heads/");
   refName = encodeURIComponent(refName);
 
-  const link = `https://dev.azure.com/${host.name}/${
-    item.parameters.repository.project.name
-  }/_git/${item.parameters.repository.name}?version=GB${refName}`;
+  const baseUrl = item.url.split("/_apis")[0];
+  const link = `${baseUrl}/_git/${
+    item.parameters.repository.name
+  }?version=GB${refName}`;
 
   return link;
 }
