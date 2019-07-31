@@ -112,7 +112,8 @@ export async function CreatePullRequestAsync(
   cherryPick: GitCherryPick,
   pullRequestContext: GitPullRequest,
   topicBranchName: string,
-  targetBranchName: string
+  targetBranchName: string,
+  pullRequestName: string
 ): Promise<IRestClientResult<GitPullRequest>> {
   try {
     if (cherryPick.status !== GitAsyncOperationStatus.Completed) {
@@ -146,18 +147,21 @@ export async function CreatePullRequestAsync(
       prSearchCriteria
     );
 
+    const pullRquestURL = `${
+      pullRequestContext.repository.webUrl
+    }/pullrequest/${pullRequestContext.pullRequestId}`;
+
     //If target topic branch has open PR
     if (pullRequests && pullRequests.length > 0) {
       const existingPullRequest = pullRequests[0];
+      const updatedDescription: any = {
+        description: `${existingPullRequest.description}
+            ------------------------------
+            This PR's commits were cherry-picked from [here](${pullRquestURL}).`
+      };
 
       //Append new description if one exists
       if (existingPullRequest.description !== pullRequestContext.description) {
-        var updatedDescription: any = {
-          description: `${pullRequestContext.description}
-          ------------------------------
-          ${existingPullRequest.description}`
-        };
-
         //Update PR
         const updatedPullRequest = await client.updatePullRequest(
           updatedDescription,
@@ -177,6 +181,10 @@ export async function CreatePullRequestAsync(
       }
     }
 
+    const updatedDescription = `${pullRequestContext.description}
+          ------------------------------
+          This PR's commits were cherry-picked from [here](${pullRquestURL}).`;
+
     //Create a new PR if none previously existed
     const completionOptions: any = {
       deleteSourceBranch: true,
@@ -188,8 +196,8 @@ export async function CreatePullRequestAsync(
       sourceRefName: `refs/heads/${topicBranchName}`,
       targetRefName: `refs/heads/${targetBranchName}`,
       completionOptions: completionOptions,
-      title: `Multi-Cherry-Picks: Merge ${topicBranchName} to ${targetBranchName}`,
-      description: pullRequestContext.description
+      title: pullRequestName,
+      description: updatedDescription
     };
 
     const newPullRequest: GitPullRequest = await client.createPullRequest(

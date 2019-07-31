@@ -8,6 +8,7 @@ export interface IPullRequest {
 export interface ICherryPickTarget {
   targetBranch: string;
   topicBranch: string;
+  pullRequestName: string;
   id: string;
   createPr: boolean;
   error: boolean;

@@ -68,6 +68,7 @@ export class FormView extends React.Component<Props, FormState> {
       id: Guid.newGuid(),
       targetBranch: "",
       topicBranch: "",
+      pullRequestName: "",
       createPr: true,
       error: false,
       errorMessage: "",
@@ -99,6 +100,17 @@ export class FormView extends React.Component<Props, FormState> {
     this.props.updateTargets(newTargets);
   };
 
+  handlePRTitleChange = (newValue: string, id: string) => {
+    const { targets } = this.props;
+    const rowIndex = findIndex(id, targets);
+    let newTargets = [...targets];
+
+    newTargets[rowIndex].pullRequestName = newValue;
+    newTargets[rowIndex].error = false;
+    newTargets[rowIndex].errorMessage = "";
+    this.props.updateTargets(newTargets);
+  };
+
   handleInputTopicText = (newValue: string, id: string) => {
     const { targets } = this.props;
     const rowIndex = findIndex(id, targets);
@@ -107,6 +119,7 @@ export class FormView extends React.Component<Props, FormState> {
     newTargets[rowIndex].topicBranch = newValue;
     newTargets[rowIndex].error = false;
     newTargets[rowIndex].errorMessage = "";
+
     this.props.updateTargets(newTargets);
   };
 
@@ -139,6 +152,9 @@ export class FormView extends React.Component<Props, FormState> {
       count++;
     }
 
+    let generatedPullRequestName = `Multi-Cherry-Picks: Merge ${generatedTopicBranchName} to ${targetBranchName}`;
+
+    newTargets[rowIndex].pullRequestName = generatedPullRequestName;
     newTargets[rowIndex].targetBranch = targetBranchName;
     newTargets[rowIndex].topicBranch = generatedTopicBranchName;
 
@@ -351,8 +367,29 @@ export class FormView extends React.Component<Props, FormState> {
               </td>
             </tr>
 
+            {tableItem.createPr && (
+              <tr className="cherry-pick-row">
+                <td className="cherry-pick-text">Pull request title:</td>
+                <td className="cherry-pick-row">
+                  <FormItem
+                    message={tableItem.errorMessage}
+                    error={tableItem.error}
+                  >
+                    <TextField
+                      value={tableItem.pullRequestName}
+                      onChange={(e, newValue) =>
+                        this.handlePRTitleChange(newValue, tableItem.id)
+                      }
+                      placeholder="type here..."
+                      width={TextFieldWidth.auto}
+                    />
+                  </FormItem>
+                </td>
+              </tr>
+            )}
+
             <tr className="cherry-pick-row">
-              <td className="cherry-pick-text">Pull Request:</td>
+              <td className="cherry-pick-text">Pull request:</td>
               <td className="cherry-pick-row">
                 <Checkbox
                   onChange={this.handlePRChange(tableItem.id)}
