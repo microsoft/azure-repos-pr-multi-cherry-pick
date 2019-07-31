@@ -68,6 +68,7 @@ export class FormView extends React.Component<Props, FormState> {
       id: Guid.newGuid(),
       targetBranch: "",
       topicBranch: "",
+      pullRequestName: "",
       createPr: true,
       error: false,
       errorMessage: "",
@@ -99,14 +100,26 @@ export class FormView extends React.Component<Props, FormState> {
     this.props.updateTargets(newTargets);
   };
 
-  handleInputTopicText = (newValue: string, id: string) => {
+  handlePRTitleChange = (newValue: string, id: string) => {
     const { targets } = this.props;
+    const rowIndex = findIndex(id, targets);
+    let newTargets = [...targets];
+
+    newTargets[rowIndex].pullRequestName = newValue;
+    newTargets[rowIndex].error = false;
+    newTargets[rowIndex].errorMessage = "";
+    this.props.updateTargets(newTargets);
+  };
+
+  handleInputTopicText = (newValue: string, id: string) => {
+    const { targets, pullRequest } = this.props;
     const rowIndex = findIndex(id, targets);
     let newTargets = [...targets];
 
     newTargets[rowIndex].topicBranch = newValue;
     newTargets[rowIndex].error = false;
     newTargets[rowIndex].errorMessage = "";
+
     this.props.updateTargets(newTargets);
   };
 
@@ -139,6 +152,9 @@ export class FormView extends React.Component<Props, FormState> {
       count++;
     }
 
+    let generatedPullRequestName = `Multi-Cherry-Picks: Merge ${generatedTopicBranchName} to ${targetBranchName}`;
+
+    newTargets[rowIndex].pullRequestName = generatedPullRequestName;
     newTargets[rowIndex].targetBranch = targetBranchName;
     newTargets[rowIndex].topicBranch = generatedTopicBranchName;
 
@@ -289,81 +305,184 @@ export class FormView extends React.Component<Props, FormState> {
     tableColumn: ITableColumn<ICherryPickTarget>,
     tableItem: ICherryPickTarget
   ): JSX.Element => {
-    return (
-      <SimpleTableCell
-        columnIndex={columnIndex}
-        tableColumn={tableColumn}
-        key={"col-" + columnIndex}
-        contentClassName="fontWeightSemiBold font-weight-semibold fontSizeM font-size-m scroll-hidden cherry-pick-container"
-      >
-        <table className="cherry-pick-table">
-          <tbody>
-            <tr className="cherry-pick-row">
-              <td className="cherry-pick-text">Target branch:</td>
-              <td className="cherry-pick-row">
-                <div className="scroll-hidden" key={tableItem.id}>
-                  <Tooltip overflowOnly={true} key={tableItem.id}>
-                    <Observer selection={tableItem.selection}>
-                      {() => {
-                        return (
-                          <Dropdown
-                            key={tableItem.id}
-                            items={this.itemProviderGrouped}
-                            loading={this.state.loading}
-                            placeholder="Select a branch"
-                            filteredNoResultsText="No matching branch names found."
-                            onSelect={(e, newValue) =>
-                              this.handleDropdownChange(newValue, tableItem.id)
-                            }
-                            renderSelectedItems={(selection, items) =>
-                              this.retrevePreviousDropdown(
-                                selection,
-                                items,
-                                tableItem
-                              )
-                            }
-                            selection={tableItem.selection}
-                          />
-                        );
-                      }}
-                    </Observer>
-                  </Tooltip>
-                </div>
-              </td>
-            </tr>
+    if (tableItem.createPr) {
+      return (
+        <SimpleTableCell
+          columnIndex={columnIndex}
+          tableColumn={tableColumn}
+          key={"col-" + columnIndex}
+          contentClassName="fontWeightSemiBold font-weight-semibold fontSizeM font-size-m scroll-hidden cherry-pick-container"
+        >
+          <table className="cherry-pick-table">
+            <tbody>
+              <tr className="cherry-pick-row">
+                <td className="cherry-pick-text">Target branch:</td>
+                <td className="cherry-pick-row">
+                  <div className="scroll-hidden" key={tableItem.id}>
+                    <Tooltip overflowOnly={true} key={tableItem.id}>
+                      <Observer selection={tableItem.selection}>
+                        {() => {
+                          return (
+                            <Dropdown
+                              key={tableItem.id}
+                              items={this.itemProviderGrouped}
+                              loading={this.state.loading}
+                              placeholder="Select a branch"
+                              filteredNoResultsText="No matching branch names found."
+                              onSelect={(e, newValue) =>
+                                this.handleDropdownChange(
+                                  newValue,
+                                  tableItem.id
+                                )
+                              }
+                              renderSelectedItems={(selection, items) =>
+                                this.retrevePreviousDropdown(
+                                  selection,
+                                  items,
+                                  tableItem
+                                )
+                              }
+                              selection={tableItem.selection}
+                            />
+                          );
+                        }}
+                      </Observer>
+                    </Tooltip>
+                  </div>
+                </td>
+              </tr>
 
-            <tr className="cherry-pick-row">
-              <td className="cherry-pick-text">Topic branch:</td>
-              <td className="cherry-pick-row">
-                <FormItem
-                  message={tableItem.errorMessage}
-                  error={tableItem.error}
-                >
-                  <TextField
-                    value={tableItem.topicBranch}
-                    onChange={(e, newValue) =>
-                      this.handleInputTopicText(newValue, tableItem.id)
-                    }
-                    placeholder="type here..."
-                    width={TextFieldWidth.auto}
+              <tr className="cherry-pick-row">
+                <td className="cherry-pick-text">Topic branch:</td>
+                <td className="cherry-pick-row">
+                  <FormItem
+                    message={tableItem.errorMessage}
+                    error={tableItem.error}
+                  >
+                    <TextField
+                      value={tableItem.topicBranch}
+                      onChange={(e, newValue) =>
+                        this.handleInputTopicText(newValue, tableItem.id)
+                      }
+                      placeholder="type here..."
+                      width={TextFieldWidth.auto}
+                    />
+                  </FormItem>
+                </td>
+              </tr>
+
+              <tr className="cherry-pick-row">
+                <td className="cherry-pick-text">Pull request title:</td>
+                <td className="cherry-pick-row">
+                  <FormItem
+                    message={tableItem.errorMessage}
+                    error={tableItem.error}
+                  >
+                    <TextField
+                      value={tableItem.pullRequestName}
+                      onChange={(e, newValue) =>
+                        this.handlePRTitleChange(newValue, tableItem.id)
+                      }
+                      placeholder="type here..."
+                      width={TextFieldWidth.auto}
+                    />
+                  </FormItem>
+                </td>
+              </tr>
+
+              <tr className="cherry-pick-row">
+                <td className="cherry-pick-text">Pull request:</td>
+                <td className="cherry-pick-row">
+                  <Checkbox
+                    onChange={this.handlePRChange(tableItem.id)}
+                    checked={tableItem.createPr}
                   />
-                </FormItem>
-              </td>
-            </tr>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </SimpleTableCell>
+      );
+    } else {
+      return (
+        <SimpleTableCell
+          columnIndex={columnIndex}
+          tableColumn={tableColumn}
+          key={"col-" + columnIndex}
+          contentClassName="fontWeightSemiBold font-weight-semibold fontSizeM font-size-m scroll-hidden cherry-pick-container"
+        >
+          <table className="cherry-pick-table">
+            <tbody>
+              <tr className="cherry-pick-row">
+                <td className="cherry-pick-text">Target branch:</td>
+                <td className="cherry-pick-row">
+                  <div className="scroll-hidden" key={tableItem.id}>
+                    <Tooltip overflowOnly={true} key={tableItem.id}>
+                      <Observer selection={tableItem.selection}>
+                        {() => {
+                          return (
+                            <Dropdown
+                              key={tableItem.id}
+                              items={this.itemProviderGrouped}
+                              loading={this.state.loading}
+                              placeholder="Select a branch"
+                              filteredNoResultsText="No matching branch names found."
+                              onSelect={(e, newValue) =>
+                                this.handleDropdownChange(
+                                  newValue,
+                                  tableItem.id
+                                )
+                              }
+                              renderSelectedItems={(selection, items) =>
+                                this.retrevePreviousDropdown(
+                                  selection,
+                                  items,
+                                  tableItem
+                                )
+                              }
+                              selection={tableItem.selection}
+                            />
+                          );
+                        }}
+                      </Observer>
+                    </Tooltip>
+                  </div>
+                </td>
+              </tr>
 
-            <tr className="cherry-pick-row">
-              <td className="cherry-pick-text">Pull Request:</td>
-              <td className="cherry-pick-row">
-                <Checkbox
-                  onChange={this.handlePRChange(tableItem.id)}
-                  checked={tableItem.createPr}
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </SimpleTableCell>
-    );
+              <tr className="cherry-pick-row">
+                <td className="cherry-pick-text">Topic branch:</td>
+                <td className="cherry-pick-row">
+                  <FormItem
+                    message={tableItem.errorMessage}
+                    error={tableItem.error}
+                  >
+                    <TextField
+                      value={tableItem.topicBranch}
+                      onChange={(e, newValue) =>
+                        this.handleInputTopicText(newValue, tableItem.id)
+                      }
+                      placeholder="type here..."
+                      width={TextFieldWidth.auto}
+                    />
+                  </FormItem>
+                </td>
+              </tr>
+
+              <tr className="cherry-pick-row">
+                <td className="cherry-pick-text">Pull request:</td>
+                <td className="cherry-pick-row">
+                  <Checkbox
+                    onChange={this.handlePRChange(tableItem.id)}
+                    checked={tableItem.createPr}
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </SimpleTableCell>
+      );
+    }
   };
 
   private asyncColumns: ITableColumn<ICherryPickTarget>[] = [

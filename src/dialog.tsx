@@ -154,7 +154,8 @@ class DialogContent extends React.Component<{}, IDialogState> {
         cherryPickResult.result,
         pullRequestContext,
         target.topicBranch,
-        target.targetBranch
+        target.targetBranch,
+        target.pullRequestName
       );
 
       if (createdPrResult.error || !createdPrResult.result) {
