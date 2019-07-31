@@ -45,6 +45,7 @@ class DialogContent extends React.Component<{}, IDialogState> {
       createPr: true,
       error: false,
       errorMessage: "",
+      pullRequestName: "",
       selection: new DropdownSelection()
     }
   ];
