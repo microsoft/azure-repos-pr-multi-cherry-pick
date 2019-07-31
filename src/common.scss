@@ -72,7 +72,17 @@ body {
   overflow-wrap: break-word;
 }
 
+.bolt-textfield.flex-row.flex-center.focus-treatment {
+  width: $form-input-width;
+  height: 100%;
+}
+
 .flex-column.bolt-textfield-default-width.bolt-textfield-default-width {
+  width: $form-input-width;
+  height: 100%;
+}
+
+.bolt-dropdown-expandable.bolt-dropdown-expandable-text-field.bolt-expandable-textfield {
   width: $form-input-width;
   height: 100%;
 }
