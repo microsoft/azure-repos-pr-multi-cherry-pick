@@ -149,7 +149,7 @@ export async function CreatePullRequestAsync(
 
     const pullRquestURL = `${
       pullRequestContext.repository.webUrl
-    }/pullrequest/${pullRequestContext.pullRequestId}_a=overview`;
+    }/pullrequest/${pullRequestContext.pullRequestId}`;
 
     //If target topic branch has open PR
     if (pullRequests && pullRequests.length > 0) {
@@ -157,7 +157,7 @@ export async function CreatePullRequestAsync(
       const updatedDescription: any = {
         description: `${existingPullRequest.description}
             ------------------------------
-            This PR's commits were cherry picked from this <a href='${pullRquestURL}' target='_blank'>pull request</a>`
+            This PR's commits were cherry-picked from [here](${pullRquestURL}).`
       };
 
       //Append new description if one exists
@@ -183,7 +183,7 @@ export async function CreatePullRequestAsync(
 
     const updatedDescription = `${pullRequestContext.description}
           ------------------------------
-          This PR's commits were cherry picked from this <a href='${pullRquestURL}' target='_blank'>pull request</a>`;
+          This PR's commits were cherry-picked from [here](${pullRquestURL}).`;
 
     //Create a new PR if none previously existed
     const completionOptions: any = {
