@@ -87,15 +87,18 @@ class DialogContent extends React.Component<{}, IDialogState> {
     const { targets } = this.state;
     const rowIndex = findIndex(id, targets);
 
-    this.setState(prevState => {
-      prevState.targets[rowIndex].errorMessage = errorMessage;
-      prevState.targets[rowIndex].error = true;
-      return prevState;
-    });
-
-    this.setState({
-      errors: true
-    });
+    this.setState(
+      prevState => {
+        prevState.targets[rowIndex].errorMessage = errorMessage;
+        prevState.targets[rowIndex].error = true;
+        return prevState;
+      },
+      () =>
+        this.setState({
+          errors: true,
+          buttonDisabled: true
+        })
+    );
   };
 
   turnOffErrorMessage = (id: string) => {
@@ -108,7 +111,8 @@ class DialogContent extends React.Component<{}, IDialogState> {
       return prevState;
     });
     this.setState({
-      errors: false
+      errors: false,
+      buttonDisabled: false
     });
   };
 
@@ -269,6 +273,7 @@ class DialogContent extends React.Component<{}, IDialogState> {
               updateTargets={this.updateTargets}
               pullRequest={pullRequest!}
               turnOffErrorMessage={this.turnOffErrorMessage}
+              turnOnErrorMessage={this.turnOnErrorMessage}
             />
           </div>
           <ButtonGroup className="sample-panel-button-bar">
