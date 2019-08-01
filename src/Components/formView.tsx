@@ -23,7 +23,7 @@ import {
   ListBoxItemType
 } from "azure-devops-ui/ListBox";
 import { IListSelection } from "azure-devops-ui/List";
-import { trimStart, findIndex } from "../utilities";
+import { trimStart, findIndex, spacesValidation } from "../utilities";
 
 import {
   ITableColumn,
@@ -43,6 +43,7 @@ interface Props {
   pullRequest: GitPullRequest;
   updateTargets: (newTargets: ICherryPickTarget[]) => void;
   turnOffErrorMessage: (id: string) => void;
+  turnOnErrorMessage: (id: string, errorMessage: string) => void;
 }
 
 interface FormState {
@@ -100,14 +101,13 @@ export class FormView extends React.Component<Props, FormState> {
     this.props.updateTargets(newTargets);
   };
 
-  handlePRTitleChange = (newValue: string, id: string) => {
+  handleInputPRTitleChange = (newValue: string, id: string) => {
     const { targets } = this.props;
     const rowIndex = findIndex(id, targets);
     let newTargets = [...targets];
 
     newTargets[rowIndex].pullRequestName = newValue;
-    newTargets[rowIndex].error = false;
-    newTargets[rowIndex].errorMessage = "";
+    this.props.turnOffErrorMessage(id);
     this.props.updateTargets(newTargets);
   };
 
@@ -116,10 +116,14 @@ export class FormView extends React.Component<Props, FormState> {
     const rowIndex = findIndex(id, targets);
     let newTargets = [...targets];
 
-    newTargets[rowIndex].topicBranch = newValue;
-    newTargets[rowIndex].error = false;
-    newTargets[rowIndex].errorMessage = "";
+    if (!spacesValidation(newValue)) {
+      const errorMessage = "Branch names are not allowed to have spaces";
+      this.props.turnOnErrorMessage(id, errorMessage);
+    } else {
+      this.props.turnOffErrorMessage(id);
+    }
 
+    newTargets[rowIndex].topicBranch = newValue;
     this.props.updateTargets(newTargets);
   };
 
@@ -371,14 +375,11 @@ export class FormView extends React.Component<Props, FormState> {
               <tr className="cherry-pick-row">
                 <td className="cherry-pick-text">Pull request title:</td>
                 <td className="cherry-pick-row">
-                  <FormItem
-                    message={tableItem.errorMessage}
-                    error={tableItem.error}
-                  >
+                  <FormItem message={tableItem.errorMessage}>
                     <TextField
                       value={tableItem.pullRequestName}
                       onChange={(e, newValue) =>
-                        this.handlePRTitleChange(newValue, tableItem.id)
+                        this.handleInputPRTitleChange(newValue, tableItem.id)
                       }
                       placeholder="type here..."
                       width={TextFieldWidth.auto}

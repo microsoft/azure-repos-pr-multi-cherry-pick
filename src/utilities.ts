@@ -24,6 +24,15 @@ export function trimStart(target: string, trim: string): string {
   return target;
 }
 
+export function spacesValidation(text: string): boolean {
+  let trimmed = text.trim();
+  let noSpaces = true;
+
+  if (trimmed.indexOf(" ") > -1) noSpaces = false;
+
+  return noSpaces;
+}
+
 export function formatPrUrl(item: GitPullRequest): string {
   const host = SDK.getHost();
 

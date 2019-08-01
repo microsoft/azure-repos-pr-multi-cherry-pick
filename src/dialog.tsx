@@ -269,6 +269,7 @@ class DialogContent extends React.Component<{}, IDialogState> {
               updateTargets={this.updateTargets}
               pullRequest={pullRequest!}
               turnOffErrorMessage={this.turnOffErrorMessage}
+              turnOnErrorMessage={this.turnOnErrorMessage}
             />
           </div>
           <ButtonGroup className="sample-panel-button-bar">
