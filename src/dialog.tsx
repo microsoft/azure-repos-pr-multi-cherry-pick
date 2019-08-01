@@ -87,15 +87,18 @@ class DialogContent extends React.Component<{}, IDialogState> {
     const { targets } = this.state;
     const rowIndex = findIndex(id, targets);
 
-    this.setState(prevState => {
-      prevState.targets[rowIndex].errorMessage = errorMessage;
-      prevState.targets[rowIndex].error = true;
-      return prevState;
-    });
-
-    this.setState({
-      errors: true
-    });
+    this.setState(
+      prevState => {
+        prevState.targets[rowIndex].errorMessage = errorMessage;
+        prevState.targets[rowIndex].error = true;
+        return prevState;
+      },
+      () =>
+        this.setState({
+          errors: true,
+          buttonDisabled: true
+        })
+    );
   };
 
   turnOffErrorMessage = (id: string) => {
@@ -108,7 +111,8 @@ class DialogContent extends React.Component<{}, IDialogState> {
       return prevState;
     });
     this.setState({
-      errors: false
+      errors: false,
+      buttonDisabled: false
     });
   };
 
