@@ -27,7 +27,7 @@ export function trimStart(target: string, trim: string): string {
 export function spacesValidation(text: string): boolean {
   //  let trimmed = text.trim();
 
-  return !text.split("").some(x => x == " ");
+  return !text.split("").includes(" ");
 }
 
 export function formatPrUrl(item: GitPullRequest): string {
