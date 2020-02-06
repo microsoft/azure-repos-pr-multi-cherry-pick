@@ -192,12 +192,18 @@ export async function CreatePullRequestAsync(
       squashMerge: true
     };
 
+    const workItemRefs = await client.getPullRequestWorkItemRefs(
+      pullRequestContext.repository.id,
+      pullRequestContext.pullRequestId
+    );
+
     const pullRequestToCreate: any = {
       sourceRefName: `refs/heads/${topicBranchName}`,
       targetRefName: `refs/heads/${targetBranchName}`,
       completionOptions: completionOptions,
       title: pullRequestName,
-      description: updatedDescription
+      description: updatedDescription,
+      workItemRefs: workItemRefs
     };
 
     const newPullRequest: GitPullRequest = await client.createPullRequest(
