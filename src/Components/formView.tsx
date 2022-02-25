@@ -156,7 +156,7 @@ export class FormView extends React.Component<Props, FormState> {
       count++;
     }
 
-    let generatedPullRequestName = `Multi-Cherry-Picks: Merge ${generatedTopicBranchName} to ${targetBranchName}`;
+    let generatedPullRequestName = `Cherry-Pick: ${pullRequest.title}`;
 
     newTargets[rowIndex].pullRequestName = generatedPullRequestName;
     newTargets[rowIndex].targetBranch = targetBranchName;
